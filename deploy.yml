@@ -1,0 +1,106 @@
+# deploy.yml - 自动部署到自定义服务器
+name: Deploy to Custom Server
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  # 部署配置
+  SERVER_HOST: ${{ secrets.SERVER_HOST }}  # 服务器IP或域名
+  SERVER_PORT: 22  # SSH端口，默认22
+  SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}  # 服务器用户名
+  DEPLOY_PATH: /opt/lcs  # 服务器上的部署路径
+  
+  # 应用配置
+  DOCKER_IMAGE: nginx:alpine  # 可选：如果使用Docker部署
+  APP_PORT: 80  # 应用端口
+  LOCAL_PORT: 8080  # 本地映射端口
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置SSH密钥
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 添加服务器到已知主机
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ env.SERVER_PORT }} ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 部署到服务器
+        run: |
+          # 创建部署目录（如果不存在）
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_HOST }} "mkdir -p ${{ env.DEPLOY_PATH }}"
+          
+          # 复制项目文件到服务器
+          scp -P ${{ env.SERVER_PORT }} -r ./* ${{ env.SERVER_USERNAME }}@${{ env.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/
+          
+          # 设置权限
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_HOST }} "chmod +x ${{ env.DEPLOY_PATH }}/access.sh"
+          
+          # 在服务器上执行部署命令
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_HOST }} "cd ${{ env.DEPLOY_PATH }} && \
+            # 安装依赖
+            sudo apt-get update && \
+            sudo apt-get install -y terraform docker.io && \
+            
+            # 配置云凭证（如果需要）
+            export TENCENTCLOUD_SECRET_ID='${{ secrets.TENCENT_SECRET_ID }}' && \
+            export TENCENTCLOUD_SECRET_KEY='${{ secrets.TENCENT_SECRET_KEY }}' && \
+            
+            # 部署基础设施
+            terraform init && \
+            terraform apply -auto-approve -var='docker_image=${{ env.DOCKER_IMAGE }}' && \
+            
+            # 获取输出并启动服务
+            export SERVER_IP=\$(terraform output -raw public_ip) && \
+            echo \"部署完成，服务器IP: \$SERVER_IP\""
+
+      - name: 建立SSH隧道（可选）
+        run: |
+          # 在GitHub Actions运行器上建立SSH隧道
+          # 注意：这只在Actions运行期间有效
+          ssh -N -L ${{ env.LOCAL_PORT }}:localhost:${{ env.APP_PORT }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_HOST }} &
+          echo "SSH隧道已建立，可通过 http://localhost:${{ env.LOCAL_PORT }} 访问服务"
+          sleep 5
+          
+          # 验证服务是否可访问
+          curl -I http://localhost:${{ env.LOCAL_PORT }}
+
+  destroy:
+    if: github.ref == 'refs/heads/destroy'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置SSH密钥
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 添加服务器到已知主机
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ env.SERVER_PORT }} ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 销毁资源
+        run: |
+          ssh -p ${{ env.SERVER_PORT }} ${{ env.SERVER_USERNAME }}@${{ env.SERVER_HOST }} "cd ${{ env.DEPLOY_PATH }} && \
+            # 配置云凭证（如果需要）
+            export TENCENTCLOUD_SECRET_ID='${{ secrets.TENCENT_SECRET_ID }}' && \
+            export TENCENTCLOUD_SECRET_KEY='${{ secrets.TENCENT_SECRET_KEY }}' && \
+            
+            # 销毁基础设施
+            terraform init && \
+            terraform destroy -auto-approve && \
+            
+            echo \"资源已成功销毁\""

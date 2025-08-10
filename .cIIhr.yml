@@ -1,0 +1,75 @@
+# .cIIhr.yml —— 一键部署 & 一键销毁
+name: cloud-one-click
+
+on: [push, workflow_dispatch]   # push 触发部署；手动触发销毁
+
+env:
+  CLOUD_PROVIDER: tencent        # 可选 aws / tencent
+  REGION: ap-beijing
+  KEY_NAME: mykey                # 已上传到云平台的 SSH 公钥名称
+  IMAGE: nginx:alpine
+  LOCAL_PORT: 8080               # 本地映射端口
+
+jobs:
+  deploy:
+    if: github.ref != 'refs/heads/destroy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Terraform
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install -y terraform
+
+      - name: 安装云 CLI
+        run: |
+          if [ "${{ env.CLOUD_PROVIDER }}" = "tencent" ]; then
+            pip3 install tccli
+            tccli configure set secretId     ${{ secrets.TENCENT_SECRET_ID }}
+            tccli configure set secretKey    ${{ secrets.TENCENT_SECRET_KEY }}
+            tccli configure set region       ${{ env.REGION }}
+          else
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+            unzip -q awscliv2.zip && sudo ./aws/install
+            aws configure set aws_access_key_id     ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set default.region        ${{ env.REGION }}
+          fi
+
+      - name: Terraform 部署
+        run: |
+          terraform init
+          terraform apply -auto-approve \
+            -var="region=${{ env.REGION }}" \
+            -var="key_name=${{ env.KEY_NAME }}" \
+            -var="docker_image=${{ env.IMAGE }}"
+
+      - name: 建立 SSH 隧道
+        run: |
+          IP=$(terraform output -raw public_ip)
+          echo "Instance IP: $IP"
+          chmod +x access.sh
+          ./access.sh "$IP" "${{ env.LOCAL_PORT }}"
+
+      - name: 验证服务
+        run: |
+          sleep 10
+          curl -I http://localhost:${{ env.LOCAL_PORT }}
+
+  destroy:
+    if: github.ref == 'refs/heads/destroy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安装 Terraform
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install -y terraform
+
+      - name: Terraform 销毁
+        run: |
+          terraform init
+          terraform destroy -auto-approve

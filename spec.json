@@ -1,0 +1,23 @@
+{
+  "ImageId": "ami-0abcdef1234567890",
+  "InstanceType": "t4g.small",
+  "SecurityGroups": [{ "GroupName": "allow-ssh-only" }],
+  "BlockDeviceMappings": [
+    {
+      "DeviceName": "/dev/xvda",
+      "Ebs": {
+        "VolumeSize": 20,
+        "VolumeType": "gp3",
+        "DeleteOnTermination": true
+      }
+    }
+  ],
+  "NetworkInterfaces": [
+    {
+      "DeviceIndex": 0,
+      "Groups": ["sg-0123456789abcdef"],
+      "AssociatePublicIpAddress": true
+    }
+  ],
+  "UserData": "IyEvYmluL2Jhc2gKeXVtIGluc3RhbGwgLXkgZG9ja2VyIGdpdAojIC4uLiAoc2FtZSBjbG91ZC1pbml0IGFzIGFib3ZlKQo="
+}
