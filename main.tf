@@ -1,3 +1,97 @@
+terraform {
+  required_providers {
+    tencentcloud = {
+      source  = "tencentcloudstack/tencentcloud"
+      version = ">= 1.81.0"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}
+
+provider "tencentcloud" {
+  secret_id  = var.TENCENT_SECRET_ID
+  secret_key = var.TENCENT_SECRET_KEY
+  region     = var.region
+}
+
+provider "aws" {
+  region = var.region
+}
+
+variable "region" {
+  description = "云服务区域"
+  default     = "ap-beijing"
+}
+
+variable "key_name" {
+  description = "SSH 密钥名称"
+  default     = "mykey"
+}
+
+variable "image_id" {
+  description = "镜像 ID"
+  default     = "lighthouse-ubuntu-22.04"
+}
+
+variable "plan_id" {
+  description = "实例规格 ID"
+  default     = "bundle_2024_gen_2c4g20g"
+}
+
+variable "docker_image" {
+  description = "Docker 镜像"
+  default     = "nginx:1.25-alpine"
+}
+terraform {
+  required_providers {
+    tencentcloud = {
+      source  = "tencentcloudstack/tencentcloud"
+      version = ">= 1.81.0"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}
+
+provider "tencentcloud" {
+  secret_id  = var.TENCENT_SECRET_ID
+  secret_key = var.TENCENT_SECRET_KEY
+  region     = var.region
+}
+
+provider "aws" {
+  region = var.region
+}
+
+variable "region" {
+  description = "云服务区域"
+  default     = "ap-beijing"
+}
+
+variable "key_name" {
+  description = "SSH 密钥名称"
+  default     = "mykey"
+}
+
+variable "image_id" {
+  description = "镜像 ID"
+  default     = "lighthouse-ubuntu-22.04"
+}
+
+variable "plan_id" {
+  description = "实例规格 ID"
+  default     = "bundle_2024_gen_2c4g20g"
+}
+
+variable "docker_image" {
+  description = "Docker 镜像"
+  default     = "nginx:1.25-alpine"
+}
 variable "region" {
   description = "云服务区域"
   default     = "ap-beijing"
