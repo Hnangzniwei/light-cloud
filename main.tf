@@ -66,7 +66,7 @@ variable "docker_image" {
 
 # 根据CLOUD_PROVIDER变量选择部署哪个云服务
 locals {
-  cloud_provider = coalesce(lookup(jsondecode(chomp(file("/dev/stdin"))), "CLOUD_PROVIDER", null), "tencent")
+  cloud_provider = "tencent"
 }
 
 # 腾讯云轻量应用服务器
