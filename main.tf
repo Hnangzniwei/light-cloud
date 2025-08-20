@@ -118,14 +118,7 @@ variable "docker_image" {
 }
 
 # 腾讯云配置
-provider "tencentcloud" {
-  region = var.region
-}
 
-# AWS配置
-provider "aws" {
-  region = var.region
-}
 
 # 根据CLOUD_PROVIDER变量选择部署哪个云服务
 locals {
