@@ -1,3 +1,6 @@
+# ==========================
+# Terraform 与 Provider 配置
+# ==========================
 terraform {
   required_providers {
     tencentcloud = {
@@ -21,19 +24,27 @@ provider "aws" {
   region = var.region
 }
 
+# ==========================
+# 变量声明
+# ==========================
 variable "region" {
   description = "云服务区域"
   default     = "ap-beijing"
 }
 
 variable "key_name" {
-  description = "SSH 密钥名称"
+  description = "SSH 密钥名称（仅 AWS 使用）"
   default     = "mykey"
+}
+
+variable "lighthouse_key_id" {
+  description = "腾讯云 Lighthouse 密钥 ID（形如 skey-xxxxxxxx）"
+  type        = string
 }
 
 variable "image_id" {
   description = "镜像 ID"
-  default     = "lighthouse-ubuntu-22.04"
+  default     = "lighthouse-ubuntu-22.04"   # 腾讯云 Lighthouse 镜像
 }
 
 variable "plan_id" {
@@ -58,22 +69,27 @@ variable "TENCENT_SECRET_KEY" {
   sensitive   = true
 }
 
+# ==========================
+# 本地变量
+# ==========================
 locals {
-  cloud_provider = "tencent"
+  cloud_provider = "tencent"   # 可改为 "aws" 来切换部署
 }
 
-# 腾讯云轻量应用服务器
+# ==========================
+# 腾讯云 Lighthouse 实例
+# ==========================
 resource "tencentcloud_lighthouse_instance" "lcs" {
   count         = local.cloud_provider == "tencent" ? 1 : 0
   bundle_id     = var.plan_id
   blueprint_id  = var.image_id
   instance_name = "lcs-blackbox"
   zone          = "${var.region}-3"
-  key_name      = var.key_name
+  key_ids       = [var.lighthouse_key_id]
   renew_flag    = 0
 }
 
-# 防火墙规则（单独资源）
+# 腾讯云 Lighthouse 防火墙规则
 resource "tencentcloud_lighthouse_firewall_rule" "lcs_firewall" {
   count       = local.cloud_provider == "tencent" ? 1 : 0
   instance_id = tencentcloud_lighthouse_instance.lcs[0].id
@@ -93,10 +109,12 @@ resource "tencentcloud_lighthouse_firewall_rule" "lcs_firewall" {
   }
 }
 
-# AWS EC2 实例
+# ==========================
+# AWS EC2 实例（可选）
+# ==========================
 resource "aws_instance" "lcs" {
   count         = local.cloud_provider == "aws" ? 1 : 0
-  ami           = var.image_id
+  ami           = var.image_id   # 如使用 AWS，请换成 ami-xxxxxxxx
   instance_type = "t4g.small"
   key_name      = var.key_name
 
@@ -119,7 +137,9 @@ resource "aws_instance" "lcs" {
   )
 }
 
-# 输出公网 IP
+# ==========================
+# 输出
+# ==========================
 output "public_ip" {
   value = local.cloud_provider == "tencent" ? (
     length(tencentcloud_lighthouse_instance.lcs) > 0 ? tencentcloud_lighthouse_instance.lcs[0].public_ip : null
@@ -128,7 +148,6 @@ output "public_ip" {
   )
 }
 
-# 输出 SSH 命令
 output "ssh_cmd" {
   value = local.cloud_provider == "tencent" ? (
     length(tencentcloud_lighthouse_instance.lcs) > 0 ? "ssh root@${tencentcloud_lighthouse_instance.lcs[0].public_ip}" : ""
