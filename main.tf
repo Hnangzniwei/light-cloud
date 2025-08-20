@@ -68,15 +68,7 @@ provider "aws" {
   region = var.region
 }
 
-variable "region" {
-  description = "云服务区域"
-  default     = "ap-beijing"
-}
 
-variable "key_name" {
-  description = "SSH 密钥名称"
-  default     = "mykey"
-}
 
 
 
