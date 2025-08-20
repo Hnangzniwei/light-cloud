@@ -107,15 +107,9 @@ variable "image_id" {
   default     = "lighthouse-ubuntu-22.04"  # 腾讯云默认值
 }
 
-variable "plan_id" {
-  description = "实例规格ID"
-  default     = "bundle_2024_gen_2c4g20g"  # 腾讯云默认值
-}
 
-variable "docker_image" {
-  description = "Docker镜像"
-  default     = "nginx:1.25-alpine"
-}
+
+
 
 # 腾讯云配置
 
