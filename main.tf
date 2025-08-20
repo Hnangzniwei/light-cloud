@@ -78,15 +78,7 @@ variable "key_name" {
   default     = "mykey"
 }
 
-variable "image_id" {
-  description = "镜像 ID"
-  default     = "lighthouse-ubuntu-22.04"
-}
 
-variable "plan_id" {
-  description = "实例规格 ID"
-  default     = "bundle_2024_gen_2c4g20g"
-}
 
 
 
