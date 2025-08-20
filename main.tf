@@ -58,15 +58,7 @@ terraform {
   }
 }
 
-provider "tencentcloud" {
-  secret_id  = var.TENCENT_SECRET_ID
-  secret_key = var.TENCENT_SECRET_KEY
-  region     = var.region
-}
 
-provider "aws" {
-  region = var.region
-}
 
 
 
