@@ -1,0 +1,2 @@
+ main.tf（创建 1 台 2C4G 轻量云主机，带公网 IP，自动安装 Docker 并启动 nginx）
+ ◦ cloud-init.yaml（开机脚本：更新系统、安装 Docker、运行 nginx 容器
