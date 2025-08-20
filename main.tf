@@ -46,13 +46,6 @@ variable "docker_image" {
   default     = "nginx:1.25-alpine"
 }
 
-
-
-
-
-
-
-
 variable "TENCENT_SECRET_ID" {
   description = "Tencent Cloud Secret ID"
   type        = string
@@ -65,17 +58,6 @@ variable "TENCENT_SECRET_KEY" {
   sensitive   = true
 }
 
-
-
-
-
-
-
-
-# 腾讯云配置
-
-
-# 根据CLOUD_PROVIDER变量选择部署哪个云服务
 locals {
   cloud_provider = "tencent"
 }
@@ -87,56 +69,66 @@ resource "tencentcloud_lighthouse_instance" "lcs" {
   blueprint_id  = var.image_id
   instance_name = "lcs-blackbox"
   zone          = "${var.region}-3"
-  key_ids       = [var.key_name]
-  
+  key_name      = var.key_name
+  renew_flag    = 0
+}
+
+# 防火墙规则（单独资源）
+resource "tencentcloud_lighthouse_firewall_rule" "lcs_firewall" {
+  count       = local.cloud_provider == "tencent" ? 1 : 0
+  instance_id = tencentcloud_lighthouse_instance.lcs[0].id
+
   firewall_rules {
-    protocol    = "TCP"
-    port        = "22"
-    cidr_block  = "0.0.0.0/0"
+    protocol   = "TCP"
+    port       = "22"
+    cidr_block = "0.0.0.0/0"
+    action     = "ACCEPT"
   }
-  
+
   firewall_rules {
-    protocol    = "TCP"
-    port        = "80"
-    cidr_block  = "0.0.0.0/0"
+    protocol   = "TCP"
+    port       = "80"
+    cidr_block = "0.0.0.0/0"
+    action     = "ACCEPT"
   }
 }
 
-# AWS EC2实例
+# AWS EC2 实例
 resource "aws_instance" "lcs" {
   count         = local.cloud_provider == "aws" ? 1 : 0
   ami           = var.image_id
   instance_type = "t4g.small"
   key_name      = var.key_name
-  
+
   tags = {
     Name = "lcs-blackbox"
   }
-  
+
   root_block_device {
     volume_size = 20
     volume_type = "gp3"
   }
-  
-  user_data = <<-EOF
+
+  user_data = base64encode(<<-EOF
     #!/bin/bash
     apt-get update
     apt-get install -y docker.io
     systemctl enable --now docker
-    docker run -d --name lcs --restart=always -p 80:80 ${var.docker_image}
+    docker run -d --name lcs -p 80:80 ${var.docker_image}
   EOF
-}
-
-# 输出公网IP
-output "public_ip" {
-  value = local.cloud_provider == "tencent" ? (
-    length(tencentcloud_lighthouse_instance.lcs) > 0 ? tencentcloud_lighthouse_instance.lcs[0].public_ip : ""
-  ) : (
-    length(aws_instance.lcs) > 0 ? aws_instance.lcs[0].public_ip : ""
   )
 }
 
-# 输出SSH命令
+# 输出公网 IP
+output "public_ip" {
+  value = local.cloud_provider == "tencent" ? (
+    length(tencentcloud_lighthouse_instance.lcs) > 0 ? tencentcloud_lighthouse_instance.lcs[0].public_ip : null
+  ) : (
+    length(aws_instance.lcs) > 0 ? aws_instance.lcs[0].public_ip : null
+  )
+}
+
+# 输出 SSH 命令
 output "ssh_cmd" {
   value = local.cloud_provider == "tencent" ? (
     length(tencentcloud_lighthouse_instance.lcs) > 0 ? "ssh root@${tencentcloud_lighthouse_instance.lcs[0].public_ip}" : ""
