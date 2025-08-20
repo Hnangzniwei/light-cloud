@@ -97,15 +97,7 @@ variable "region" {
   default     = "ap-beijing"
 }
 
-variable "key_name" {
-  description = "SSH密钥名称"
-  default     = "mykey"
-}
 
-variable "image_id" {
-  description = "镜像ID"
-  default     = "lighthouse-ubuntu-22.04"  # 腾讯云默认值
-}
 
 
 
