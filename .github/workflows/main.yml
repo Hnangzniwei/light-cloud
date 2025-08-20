@@ -1,12 +1,30 @@
+name: Deploy LCS
+
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  hello:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Say hello
-        run: echo "Hello from GitHub Actions"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6
+
+      - name: Deploy with Terraform
+        env:
+          TF_VAR_TENCENT_SECRET_ID:  ${{ secrets.TF_VAR_TENCENT_SECRET_ID }}
+          TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
+          TF_VAR_TENCENT_REGION:     ${{ secrets.TF_VAR_TENCENT_REGION }}
+        run: |
+          cd deploy
+          terraform init -input=false
+          terraform apply -auto-approve
+
 
