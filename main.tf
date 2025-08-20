@@ -88,14 +88,7 @@ variable "plan_id" {
   default     = "bundle_2024_gen_2c4g20g"
 }
 
-variable "docker_image" {
-  description = "Docker 镜像"
-  default     = "nginx:1.25-alpine"
-}
-variable "region" {
-  description = "云服务区域"
-  default     = "ap-beijing"
-}
+
 
 
 
