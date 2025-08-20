@@ -45,18 +45,7 @@ variable "docker_image" {
   description = "Docker 镜像"
   default     = "nginx:1.25-alpine"
 }
-terraform {
-  required_providers {
-    tencentcloud = {
-      source  = "tencentcloudstack/tencentcloud"
-      version = ">= 1.81.0"
-    }
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.0"
-    }
-  }
-}
+
 
 
 
