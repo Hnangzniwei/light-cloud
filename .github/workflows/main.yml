@@ -2,7 +2,7 @@ name: Deploy LCS
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -26,5 +26,3 @@ jobs:
           cd deploy
           terraform init -input=false
           terraform apply -auto-approve
-
-
