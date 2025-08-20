@@ -53,6 +53,17 @@ variable "docker_image" {
 
 
 
+variable "TENCENT_SECRET_ID" {
+  description = "Tencent Cloud Secret ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "TENCENT_SECRET_KEY" {
+  description = "Tencent Cloud Secret Key"
+  type        = string
+  sensitive   = true
+}
 
 
 
