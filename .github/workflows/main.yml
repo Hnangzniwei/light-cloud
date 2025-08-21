@@ -22,9 +22,7 @@ jobs:
           pwd
           ls -la
 
-      - name: Deploy with Terraform
-        env:
-          - name: Deploy with Terraform
+       - name: Deploy with Terraform
         env:
           TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TF_VAR_TENCENT_SECRET_ID }}
           TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
@@ -32,6 +30,7 @@ jobs:
           TF_VAR_lighthouse_key_id: ${{ secrets.TF_VAR_LIGHTHOUSE_KEY_ID }}
         run: |
           terraform init -input=false
-          terraform apply -auto-approve 
+          terraform apply -auto-approve
+ 
 
 
