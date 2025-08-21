@@ -46,4 +46,4 @@ jobs:
           TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TF_VAR_TENCENT_SECRET_ID }}
           TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
           TF_VAR_LIGHTHOUSE_KEY_ID: ${{ secrets.TF_VAR_LIGHTHOUSE_KEY_ID }}
-          TF_VAR_INSTANCE_PASSWORD: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}  # 确保大小写一致
+          TF_VAR_INSTANCE_PASSWORD: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}  # 确保大小写
