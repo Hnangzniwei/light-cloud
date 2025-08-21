@@ -86,6 +86,7 @@ resource "tencentcloud_lighthouse_instance" "lcs" {
   instance_name = "lcs-blackbox"
   zone          = "${var.region}-3"
   login_key_id = var.lighthouse_key_id
+
   renew_flag    = 0
 }
 
