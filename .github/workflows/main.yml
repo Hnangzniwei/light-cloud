@@ -30,7 +30,8 @@ jobs:
       - name: Terraform Init
   run: terraform init
   env:
-    TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]    TF\_VAR\_TENCENT\_SECRET\_KEY: $</LaTex>{{ secrets.TENCENT_SECRET_KEY }}
+  TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+
 
       - name: Terraform Validate
         run: terraform validate
