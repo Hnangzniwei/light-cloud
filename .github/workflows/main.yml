@@ -1,43 +1,43 @@
-name: Deploy Lighthouse Instance with Terraform
+name: Deploy Tencent Cloud Lighthouse with Terraform
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  TF_VAR_TENCENT_SECRET_ID:  ${{ secrets.TF_VAR_TENCENT_SECRET_ID }}
+  TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
+  TF_VAR_LIGHTHOUSE_KEY_ID:  ${{ secrets.TF_VAR_LIGHTHOUSE_KEY_ID }}
+  TF_VAR_INSTANCE_PASSWORD:  ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
+      # 1. 检出代码
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
+      # 2. 安装指定版本 Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: "1.3.0"
+          terraform_version: 1.3.0
 
+      # 3. 可选：打印密码长度（调试用，可删除）
       - name: Check password injected
-  run: echo "password length=${#TF_VAR_instance_password}"
-  env:
-    TF_VAR_instance_password: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
+        run: |
+          echo "password length=${#TF_VAR_INSTANCE_PASSWORD}"
 
-
+      # 4. 初始化
       - name: Terraform Init
         run: terraform init
 
+      # 5. 计划
       - name: Terraform Plan
-        run: terraform plan
-        env:
-          TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TF_VAR_TENCENT_SECRET_ID }}
-          TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
-          TF_VAR_LIGHTHOUSE_KEY_ID: ${{ secrets.TF_VAR_LIGHTHOUSE_KEY_ID }}
-          TF_VAR_INSTANCE_PASSWORD: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
+        run: terraform plan -no-color
 
+      # 6. 应用（自动确认）
       - name: Terraform Apply
         run: terraform apply -auto-approve
-        env:
-          TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TF_VAR_TENCENT_SECRET_ID }}
-          TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
-          TF_VAR_LIGHTHOUSE_KEY_ID: ${{ secrets.TF_VAR_LIGHTHOUSE_KEY_ID }}
-          TF_VAR_INSTANCE_PASSWORD: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
