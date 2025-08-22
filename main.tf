@@ -75,13 +75,11 @@ variable "aws_key_name" {
 }
 
 # ================ 腾讯云 Lighthouse 实例 ================
-resource "tencentcloud_lighthouse_instance" "web" {
-  count = local.is_tencent ? 1 : 0
+resource "tencentcloud_lighthouse_instance" "aws_instance" {
+  zone = "${var.region}-1"
+  # 其他配置...
+}
 
-  bundle_id       = var.bundle_id_tencent
-  blueprint_id    = var.image_id_tencent
-  instance_name   = var.instance_name
-  zone            = "<LaTex>${var.region}-1"[ty-n]  login\_settings {[ty-n]    password = var.instance\_password[ty-n]  }[ty-n][ty-n]  user\_data = <<EOF[ty-n]#!/bin/bash[ty-n]set -e[ty-n]apt-get update[ty-n]apt-get install -y docker.io[ty-n]systemctl start docker[ty-n]docker run -d -p 80:80 --restart=always nginx:alpine[ty-n]EOF[ty-n]}[ty-n][ty-n]# ================ AWS EC2 实例 ================[ty-n]resource "aws\_instance" "web" {[ty-n]  count = local.is\_aws ? 1 : 0[ty-n][ty-n]  ami           = var.ami\_aws[ty-n]  instance\_type = var.instance\_type\_aws[ty-n]  key\_name      = var.aws\_key\_name[ty-n]  vpc\_security\_group\_ids = [aws\_security\_group.allow\_http\_ssh.id][ty-n]  subnet\_id     = var.subnet\_id\_aws[ty-n]  user\_data = <<EOF[ty-n]#!/bin/bash[ty-n]set -e[ty-n]yum update -y[ty-n]amazon-linux-extras install docker -y[ty-n]systemctl start docker[ty-n]docker run -d -p 80:80 --restart=always nginx:alpine[ty-n]EOF[ty-n]  tags = {[ty-n]    Name = var.instance\_name[ty-n]  }[ty-n]}[ty-n][ty-n]# ================ AWS 安全组 ================[ty-n]resource "aws\_security\_group" "allow\_http\_ssh" {[ty-n]  count = local.is\_aws ? 1 : 0[ty-n][ty-n]  name        = "$</LaTex>{var.instance_name}-sg"
   description = "Allow SSH and HTTP"
 
   ingress {
