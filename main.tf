@@ -108,11 +108,9 @@ resource "tencentcloud_lighthouse_instance" "web" {
 
 # ================ 输出 ================
 output "public_ip" {
-  description = "实例公网 IP"
-  value = local.is_tencent ? 
-    tencentcloud_lighthouse_instance.web[0].public_ip_address : 
-    aws_instance.web[0].public_ip
+  value = aws_instance.web[0].public_ip
 }
+
 
 output "ssh_command" {
   value = "ssh root@${tencentcloud_lighthouse_instance.web[0].public_ip}"
