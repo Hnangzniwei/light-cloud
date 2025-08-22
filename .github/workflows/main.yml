@@ -1,6 +1,39 @@
-name: Terraform <LaTex>${{ github.event\_name == 'workflow\_dispatch' && 'Manual Deployment' || 'Automatic Plan' }}[ty-n][ty-n]on:[ty-n]  push:[ty-n]    branches:[ty-n]      - main[ty-n]  workflow\_dispatch:[ty-n]    inputs:[ty-n]      cloud\_provider:[ty-n]        description: 'Cloud Provider (tencent or aws)'[ty-n]        required: true[ty-n]        default: 'tencent'[ty-n]        type: string[ty-n]      action:[ty-n]        description: 'Terraform action: plan or apply'[ty-n]        required: true[ty-n]        default: 'plan'[ty-n]        type: string[ty-n]        options:[ty-n]          - plan[ty-n]          - apply[ty-n][ty-n]jobs:[ty-n]  terraform:[ty-n]    runs-on: ubuntu-latest[ty-n]    environment: production[ty-n][ty-n]    steps:[ty-n]      - name: Checkout code[ty-n]        uses: actions/checkout@v4[ty-n][ty-n]      - name: Setup Terraform[ty-n]        uses: hashicorp/setup-terraform@v3[ty-n]        with:[ty-n]          terraform\_version: 1.6.6[ty-n][ty-n]      - name: Terraform Init[ty-n]        run: terraform init[ty-n]        env:[ty-n]          TF\_VAR\_TENCENT\_SECRET\_ID: $</LaTex>{{ secrets.TENCENT_SECRET_ID }}
-          TF_VAR_TENCENT_SECRET_KEY: <LaTex>${{ secrets.TENCENT\_SECRET\_KEY }}[ty-n][ty-n]      - name: Terraform Plan[ty-n]        run: |[ty-n]          terraform plan \[ty-n]            -var="cloud\_provider=$</LaTex>{{ github.event.inputs.cloud_provider || 'tencent' }}" \
-            -var="instance_password=<LaTex>${{ secrets.INSTANCE\_PASSWORD }}" \[ty-n]            -no-color[ty-n]        env:[ty-n]          TF\_VAR\_TENCENT\_SECRET\_ID: $</LaTex>{{ secrets.TENCENT_SECRET_ID }}
-          TF_VAR_TENCENT_SECRET_KEY: <LaTex>${{ secrets.TENCENT\_SECRET\_KEY }}[ty-n][ty-n]      - name: Terraform Apply[ty-n]        if: github.event\_name == 'workflow\_dispatch' && github.event.inputs.action == 'apply'[ty-n]        run: |[ty-n]          terraform apply \[ty-n]            -var="cloud\_provider=$</LaTex>{{ github.event.inputs.cloud_provider }}" \
-            -var="instance_password=<LaTex>${{ secrets.INSTANCE\_PASSWORD }}" \[ty-n]            -auto-approve[ty-n]        env:[ty-n]          TF\_VAR\_TENCENT\_SECRET\_ID: $</LaTex>{{ secrets.TENCENT_SECRET_ID }}
-          TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+name: Terraform - <LaTex>${{ github.event\_name == 'push' && 'Auto Plan on Push' || 'Manual Deployment' }}[ty-n][ty-n]on:[ty-n]  push:[ty-n]    branches:[ty-n]      - main[ty-n]  workflow\_dispatch:[ty-n]    inputs:[ty-n]      cloud\_provider:[ty-n]        description: 'Choose cloud provider (tencent or aws)'[ty-n]        required: true[ty-n]        default: 'tencent'[ty-n]        type: string[ty-n]      terraform\_action:[ty-n]        description: 'Choose action: plan or apply'[ty-n]        required: true[ty-n]        default: 'plan'[ty-n]        type: string[ty-n]        options:[ty-n]          - plan[ty-n]          - apply[ty-n][ty-n]jobs:[ty-n]  terraform:[ty-n]    name: $</LaTex>{{ format('Terraform {0}', inputs.terraform_action) }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      # 🔹 1. 检出代码
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 🔹 2. 设置 Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      # 🔹 3. 初始化 Terraform
+      - name: Terraform Init
+        run: terraform init
+        env:
+          TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]          TF\_VAR\_TENCENT\_SECRET\_KEY: $</LaTex>{{ secrets.TENCENT_SECRET_KEY }}
+
+      # 🔹 4. 执行 Plan
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+            -var="cloud_provider=<LaTex>${{ inputs.cloud\_provider }}" \[ty-n]            -var="instance\_password=$</LaTex>{{ secrets.INSTANCE_PASSWORD }}" \
+            -no-color
+        env:
+          TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]          TF\_VAR\_TENCENT\_SECRET\_KEY: $</LaTex>{{ secrets.TENCENT_SECRET_KEY }}
+
+      # 🔹 5. 执行 Apply（仅当手动触发且选择 apply 时）
+      - name: Terraform Apply
+        if: github.event_name == 'workflow_dispatch' && inputs.terraform_action == 'apply'
+        run: |
+          terraform apply \
+            -var="cloud_provider=<LaTex>${{ inputs.cloud\_provider }}" \[ty-n]            -var="instance\_password=$</LaTex>{{ secrets.INSTANCE_PASSWORD }}" \
+            -auto-approve
+        env:
+          TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]          TF\_VAR\_TENCENT\_SECRET\_KEY: $</LaTex>{{ secrets.TENCENT_SECRET_KEY }}
