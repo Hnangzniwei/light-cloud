@@ -21,26 +21,26 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-  run: terraform init
-  env:
-  TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+    - name: Terraform Init
+      run: terraform init
+      env:
+        TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
 
+    - name: Terraform Validate
+      run: terraform validate
 
-      - name: Terraform Validate
-        run: terraform validate
+    - name: Terraform Plan
+      run: |
+        terraform plan \
+          -var="cloud_provider=${{ inputs.cloud_provider }}" \
+          TF_VAR_TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }} \
+          -auto-approve
+      env:
+        TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
 
-      - name: Terraform Plan
-        run: |
-          terraform plan \
-            -var="cloud_provider=<LaTex>${{ inputs.cloud\_provider }}" \[ty-n]            -no-color[ty-n]        env:[ty-n]          TF\_VAR\_TENCENT\_SECRET\_ID: $</LaTex>{{ secrets.TENCENT_SECRET_ID }}
-          TF_VAR_TENCENT_SECRET_KEY: <LaTex>${{ secrets.TENCENT\_SECRET\_KEY }}[ty-n][ty-n]      - name: Terraform Apply[ty-n]        if: github.event\_name == 'workflow\_dispatch' && inputs.terraform\_apply == 'true'[ty-n]        run: |[ty-n]          terraform apply \[ty-n]            -var="cloud\_provider=$</LaTex>{{ inputs.cloud_provider }}" \
-            -auto-approve
-        env:
-          TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]          TF\_VAR\_TENCENT\_SECRET\_KEY: $</LaTex>{{ secrets.TENCENT_SECRET_KEY }}
