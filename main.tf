@@ -86,15 +86,17 @@ locals {
 # 腾讯云 Lighthouse 实例
 # ==========================================
 resource "tencentcloud_lighthouse_instance" "lcs" {
+
   count         = local.cloud_provider == "tencent" ? 1 : 0
   bundle_id     = var.plan_id
   blueprint_id  = var.image_id
   instance_name = "lcs-blackbox"
   zone          = "${var.region}-3"
 
-  login_configuration {
+    login_settings = {
     password = var.instance_password
   }
+
 }
 
 # ==========================================
