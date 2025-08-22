@@ -115,7 +115,6 @@ output "public_ip" {
 }
 
 output "ssh_command" {
-  description = "SSH 登录命令"
-  value = local.is_tencent ? 
-    "ssh root@<LaTex>${tencentcloud\_lighthouse\_instance.web[0].public\_ip\_address}" :[ty-n]    "ssh ec2-user@$</LaTex>{aws_instance.web[0].public_ip}"
+  value = "ssh root@${tencentcloud_lighthouse_instance.web[0].public_ip}"
 }
+
