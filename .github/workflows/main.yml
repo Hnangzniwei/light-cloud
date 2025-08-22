@@ -28,6 +28,28 @@ jobs:
           TF_VAR_TENCENT_SECRET_KEY: ${{ secrets.TF_VAR_TENCENT_SECRET_KEY }}
           TF_VAR_LIGHTHOUSE_KEY_ID: ${{ secrets.TF_VAR_LIGHTHOUSE_KEY_ID }}
           TF_VAR_INSTANCE_PASSWORD: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}  # 确保大小写一致
+# 新增：检查变量是否注入
+- name: Check if TF_VAR_instance_password is injected
+  run: |
+    if [ -z "$TF_VAR_instance_password" ]; then
+      echo "❌ TF_VAR_instance_password is EMPTY!"
+      echo "→ 请确认 GitHub Secret 'TF_VAR_INSTANCE_PASSWORD' 已创建且非空"
+      exit 1
+    else
+      echo "✅ TF_VAR_instance_password is SET"
+      echo "  长度：${#TF_VAR_instance_password} 位"
+      echo "  首字符：${TF_VAR_instance_password:0:1}"
+      echo "  末字符：${TF_VAR_instance_password: -1}"
+      echo "（完整值已打码，仅用于验证）"
+    fi
+  env:
+    TF_VAR_instance_password: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
+
+# 原来的 Terraform Plan
+- name: Terraform Plan
+  run: terraform plan
+  env:
+    TF_VAR_instance_password: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
 
       - name: Terraform Init
         run: terraform init
