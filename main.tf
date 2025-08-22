@@ -1,70 +1,63 @@
-# ==========================================
-# Terraform & Provider 配置
-# ==========================================
+# 指定 Terraform 版本和所需 Provider
 terraform {
   required_providers {
     tencentcloud = {
       source  = "tencentcloudstack/tencentcloud"
-      version = ">= 1.81.0"
+      version = "~> 1.85"
     }
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0"
+      version = "~> 5.0"
     }
   }
 }
 
+# ================ 全局变量 ================
+locals {
+  cloud_provider = var.cloud_provider  # "tencent" 或 "aws"
+  is_tencent     = local.cloud_provider == "tencent"
+  is_aws         = local.cloud_provider == "aws"
+}
+
+# ================ Provider 配置 ================
 provider "tencentcloud" {
+  region     = var.region
   secret_id  = var.TENCENT_SECRET_ID
   secret_key = var.TENCENT_SECRET_KEY
-  region     = var.region
+  # 仅当使用腾讯云时才启用
+  skip_create_service = !local.is_tencent
 }
 
 provider "aws" {
   region = var.region
+  # 仅当使用 AWS 时才启用
+  assume_role = local.is_aws ? null : {
+    role_arn           = "arn:aws:iam::000000000000:role/NonExistentRole"
+    session_name       = "SkipProvider"
+  }
 }
 
-# ==========================================
-# 变量声明
-# ==========================================
+# ================ 变量定义 ================
+variable "cloud_provider" {
+  description = "选择云厂商: 'tencent' 或 'aws'"
+  type        = string
+  default     = "tencent"
+}
+
 variable "region" {
-  description = "云服务区域"
+  description = "云区域，如 ap-beijing / us-east-1"
   type        = string
   default     = "ap-beijing"
 }
 
-variable "key_name" {
-  description = "SSH 密钥名称（仅 AWS 使用）"
-  type        = string
-  default     = "mykey"
-}
-
-variable "image_id" {
-  description = "镜像 ID"
-  type        = string
-  default     = "lighthouse-ubuntu-22.04"
-}
-
-variable "plan_id" {
-  description = "实例规格 ID"
-  type        = string
-  default     = "bundle_2024_gen_2c4g20g"
-}
-
-variable "docker_image" {
-  description = "Docker 镜像"
-  type        = string
-  default     = "nginx:1.25-alpine"
-}
-
 variable "TENCENT_SECRET_ID" {
-  description = "Tencent Cloud Secret ID"
+  description = "腾讯云 SecretId"
   type        = string
   sensitive   = true
 }
 
 variable "TENCENT_SECRET_KEY" {
-  description = "Tencent Cloud Secret Key"
+  description = "腾讯云 SecretKey"
   type        = string
   sensitive   = true
 }
@@ -75,95 +68,54 @@ variable "instance_password" {
   sensitive   = true
 }
 
-# ==========================================
-# 本地变量
-# ==========================================
-locals {
-  cloud_provider = "tencent"  # 改成 "aws" 可切换到 AWS
+variable "aws_key_name" {
+  description = "AWS EC2 密钥对名称"
+  type        = string
+  default     = "mykey"
 }
 
-# ==========================================
-# 腾讯云 Lighthouse 实例
-# ==========================================
-resource "tencentcloud_lighthouse_instance" "lcs" {
+# ================ 腾讯云 Lighthouse 实例 ================
+resource "tencentcloud_lighthouse_instance" "web" {
+  count = local.is_tencent ? 1 : 0
 
-  count         = local.cloud_provider == "tencent" ? 1 : 0
-  bundle_id     = var.plan_id
-  blueprint_id  = var.image_id
-  instance_name = "lcs-blackbox"
-  zone          = "${var.region}-3"
+  bundle_id       = var.bundle_id_tencent
+  blueprint_id    = var.image_id_tencent
+  instance_name   = var.instance_name
+  zone            = "<LaTex>${var.region}-1"[ty-n]  login\_settings {[ty-n]    password = var.instance\_password[ty-n]  }[ty-n][ty-n]  user\_data = <<EOF[ty-n]#!/bin/bash[ty-n]set -e[ty-n]apt-get update[ty-n]apt-get install -y docker.io[ty-n]systemctl start docker[ty-n]docker run -d -p 80:80 --restart=always nginx:alpine[ty-n]EOF[ty-n]}[ty-n][ty-n]# ================ AWS EC2 实例 ================[ty-n]resource "aws\_instance" "web" {[ty-n]  count = local.is\_aws ? 1 : 0[ty-n][ty-n]  ami           = var.ami\_aws[ty-n]  instance\_type = var.instance\_type\_aws[ty-n]  key\_name      = var.aws\_key\_name[ty-n]  vpc\_security\_group\_ids = [aws\_security\_group.allow\_http\_ssh.id][ty-n]  subnet\_id     = var.subnet\_id\_aws[ty-n]  user\_data = <<EOF[ty-n]#!/bin/bash[ty-n]set -e[ty-n]yum update -y[ty-n]amazon-linux-extras install docker -y[ty-n]systemctl start docker[ty-n]docker run -d -p 80:80 --restart=always nginx:alpine[ty-n]EOF[ty-n]  tags = {[ty-n]    Name = var.instance\_name[ty-n]  }[ty-n]}[ty-n][ty-n]# ================ AWS 安全组 ================[ty-n]resource "aws\_security\_group" "allow\_http\_ssh" {[ty-n]  count = local.is\_aws ? 1 : 0[ty-n][ty-n]  name        = "$</LaTex>{var.instance_name}-sg"
+  description = "Allow SSH and HTTP"
 
-    login_settings = {
-    password = var.instance_password
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-}
-
-# ==========================================
-# 腾讯云 Lighthouse 防火墙规则
-# ==========================================
-resource "tencentcloud_lighthouse_firewall_rule" "lcs_firewall" {
-  count       = local.cloud_provider == "tencent" ? 1 : 0
-  instance_id = tencentcloud_lighthouse_instance.lcs[0].id
-
-  firewall_rules {
-    protocol   = "TCP"
-    port       = "22"
-    cidr_block = "0.0.0.0/0"
-    action     = "ACCEPT"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  firewall_rules {
-    protocol   = "TCP"
-    port       = "80"
-    cidr_block = "0.0.0.0/0"
-    action     = "ACCEPT"
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-# ==========================================
-# AWS EC2 实例（可选，local.cloud_provider="aws" 时生效）
-# ==========================================
-resource "aws_instance" "lcs" {
-  count         = local.cloud_provider == "aws" ? 1 : 0
-  ami           = var.image_id          # 若用 AWS，请换成 ami-xxxxxxxx
-  instance_type = "t4g.small"
-  key_name      = var.key_name
-
-  tags = {
-    Name = "lcs-blackbox"
-  }
-
-  root_block_device {
-    volume_size = 20
-    volume_type = "gp3"
-  }
-
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y docker.io
-    systemctl enable --now docker
-    docker run -d --name lcs -p 80:80 ${var.docker_image}
-  EOF
-  )
-}
-
-# ==========================================
-# 输出
-# ==========================================
+# ================ 输出 ================
 output "public_ip" {
-  value = local.cloud_provider == "tencent" ? (
-    length(tencentcloud_lighthouse_instance.lcs) > 0 ? tencentcloud_lighthouse_instance.lcs[0].public_ip : null
-  ) : (
-    length(aws_instance.lcs) > 0 ? aws_instance.lcs[0].public_ip : null
-  )
+  description = "实例公网 IP"
+  value = local.is_tencent ? 
+    tencentcloud_lighthouse_instance.web[0].public_ip_address : 
+    aws_instance.web[0].public_ip
 }
 
-output "ssh_cmd" {
-  value = local.cloud_provider == "tencent" ? (
-    length(tencentcloud_lighthouse_instance.lcs) > 0 ? "ssh root@${tencentcloud_lighthouse_instance.lcs[0].public_ip}" : null
-  ) : (
-    length(aws_instance.lcs) > 0 ? "ssh ec2-user@${aws_instance.lcs[0].public_ip}" : null
-  )
+output "ssh_command" {
+  description = "SSH 登录命令"
+  value = local.is_tencent ? 
+    "ssh root@<LaTex>${tencentcloud\_lighthouse\_instance.web[0].public\_ip\_address}" :[ty-n]    "ssh ec2-user@$</LaTex>{aws_instance.web[0].public_ip}"
 }
