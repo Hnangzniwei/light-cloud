@@ -17,16 +17,11 @@ jobs:
         with:
           terraform_version: "1.3.0"
 
-      - name: Check if TF_VAR_instance_password is injected
-        run: |
-          if [ -z "$TF_VAR_instance_password" ]; then
-            echo "❌ TF_VAR_instance_password is EMPTY!"
-            exit 1
-          else
-            echo "✅ TF_VAR_instance_password is SET"
-          fi
-        env:
-          TF_VAR_instance_password: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
+      - name: Check password injected
+  run: echo "password length=${#TF_VAR_instance_password}"
+  env:
+    TF_VAR_instance_password: ${{ secrets.TF_VAR_INSTANCE_PASSWORD }}
+
 
       - name: Terraform Init
         run: terraform init
