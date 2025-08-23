@@ -2,7 +2,7 @@ terraform {
   required_providers {
     tencentcloud = {
       source  = "tencentcloudstack/tencentcloud"
-      version = "1.83.0" # 手动指定版本
+      version = "1.13.0"  # 手动指定版本
     }
     aws = {
       source  = "hashicorp/aws"
@@ -10,6 +10,8 @@ terraform {
     }
   }
 }
+
+
 
 
 
