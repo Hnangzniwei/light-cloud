@@ -1,32 +1,14 @@
-# 指定 Terraform 和 Provider 版本
-terraform {
-  required_version = ">= 1.0"
-
-  required_providers {
-    tencentcloud = {
-      source  = "tencentcloudstack/tencentcloud"
-      version = "1.13.0"
-    }
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
 # 本地变量：根据 cloud_provider 判断使用哪个云厂商
 locals {
   cloud_provider = lower(var.cloud_provider)
-
-  is_tencent = local.cloud_provider == "tencent"
-  is_aws     = local.cloud_provider == "aws"
+  is_tencent    = local.cloud_provider == "tencent"
+  is_aws        = local.cloud_provider == "aws"
 }
 
 # 腾讯云 Provider 配置
 provider "tencentcloud" {
-  region = var.region
-
-  secret_id  = var.TENCENT_SECRET_ID
+  region   = var.region
+  secret_id = var.TENCENT_SECRET_ID
   secret_key = var.TENCENT_SECRET_KEY
 
   # 仅当选择腾讯云时启用
@@ -43,13 +25,13 @@ provider "aws" {
     role_arn = local.is_aws && var.AWS_ASSUME_ROLE_ARN != "" ? var.AWS_ASSUME_ROLE_ARN : null
   }
 
+  # 仅当选择 AWS 时启用
   count = local.is_aws ? 1 : 0
 }
 
 # 腾讯云 Lighthouse 实例（轻量应用服务器）
 resource "tencentcloud_lighthouse_instance" "lighthouse" {
-  count = local.is_tencent ? 1 : 0
-
- availability_zone = lookup(var.tencent_zones, var.region, "${var.region}-1") 
-  }
+  count             = local.is_tencent ? 1 : 0
+  availability_zone = lookup(var.tencent_zones, var.region, "${var.region}-1")
+  # 其他 Lighthouse 实例配置项...
 }
