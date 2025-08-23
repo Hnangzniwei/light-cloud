@@ -50,6 +50,6 @@ provider "aws" {
 resource "tencentcloud_lighthouse_instance" "lighthouse" {
   count = local.is_tencent ? 1 : 0
 
-  availability_zone = lookup(var.tencent_zones, var.region, "<LaTex>${var.region}-1")[ty-n]  blueprint\_id      = var.tencent\_blueprint\_id[ty-n]  bundle\_id         = var.tencent\_bundle\_id[ty-n]  instance\_name     = var.instance\_name[ty-n][ty-n]  # 密码需满足复杂度要求[ty-n]  login\_password = var.instance\_password[ty-n][ty-n]  # 是否自动续费[ty-n]  renew\_flag = var.tencent\_renew\_flag[ty-n]}[ty-n][ty-n]# AWS EC2 实例（作为对比示例）[ty-n]resource "aws\_instance" "web" {[ty-n]  count = local.is\_aws ? 1 : 0[ty-n][ty-n]  ami           = var.AWS\_AMI\_ID[ty-n]  instance\_type = var.AWS\_INSTANCE\_TYPE[ty-n]  key\_name      = var.aws\_key\_name[ty-n]  subnet\_id     = var.AWS\_SUBNET\_ID[ty-n]  vpc\_security\_group\_ids = var.AWS\_SECURITY\_GROUP\_IDS[ty-n][ty-n]  tags = {[ty-n]    Name = "$</LaTex>{var.instance_name}-aws"
+ availability_zone = lookup(var.tencent_zones, var.region, "${var.region}-1") 
   }
 }
