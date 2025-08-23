@@ -1,9 +1,8 @@
-# 指定 Terraform 版本和所需 Provider
 terraform {
   required_providers {
     tencentcloud = {
       source  = "tencentcloudstack/tencentcloud"
-      version = "~> 1.85"
+      version = "~> 1.84" # 尝试使用其他版本
     }
     aws = {
       source  = "hashicorp/aws"
@@ -11,6 +10,7 @@ terraform {
     }
   }
 }
+
 
 # 全局变量
 locals {
