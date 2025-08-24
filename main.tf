@@ -5,6 +5,19 @@ locals {
   is_aws        = local.cloud_provider == "aws"
 }
 
+# main.tf 或 providers.tf
+
+terraform {
+  required_providers {
+    tencentcloud = {
+      source = "terraformcloudstack/tencentcloud"
+    }
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
 # 腾讯云 Provider 配置
 provider "tencentcloud" {
   region     = var.region
@@ -18,8 +31,7 @@ provider "aws" {
 
   # 可选：假设角色，用于跨账户访问
   assume_role {
-    # 只有在 is_aws 为 true 且提供了 role_arn 时才启用
-    role_arn = local.is_aws && var.AWS_ASSUME_ROLE_ARN != "" ? var.AWS_ASSUME_ROLE_ARN : null
+    role_arn = var.AWS_ASSUME_ROLE_ARN
   }
 }
 
