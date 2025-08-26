@@ -7,22 +7,21 @@ locals {
 
 # main.tf 或 providers.tf
 
+# 指定 Terraform 所需的 provider 和版本
 terraform {
   required_providers {
-    tencentcloud = {
-      source = "terraformcloudstack/tencentcloud"
-    }
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 5.0"  # 推荐使用最新稳定版
     }
   }
 }
 
-# 腾讯云 Provider 配置
-provider "tencentcloud" {
+# 配置 AWS Provider
+provider "aws" {
   region     = var.region
-  secret_id  = var.TENCENT_SECRET_ID
-  secret_key = var.TENCENT_SECRET_KEY
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
 
 # AWS Provider 配置
