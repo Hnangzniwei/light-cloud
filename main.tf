@@ -24,15 +24,7 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
-# AWS Provider 配置
-provider "aws" {
-  region = var.region
 
-  # 可选：假设角色，用于跨账户访问
-  assume_role {
-    role_arn = var.AWS_ASSUME_ROLE_ARN
-  }
-}
 
 # 腾讯云 Lighthouse 实例（轻量应用服务器）
 resource "tencentcloud_lighthouse_instance" "lighthouse" {
