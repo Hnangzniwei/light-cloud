@@ -11,14 +11,15 @@ locals {
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source  = "tencentcloudstack/tencentcloud"
+  
       version = "~> 5.0"  # 推荐使用最新稳定版
     }
   }
 }
 
 # 配置 AWS Provider
-provider "aws" {
+provider "tencentcloud"  {
   region     = var.region
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
