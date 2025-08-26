@@ -9,27 +9,20 @@ variable "cloud_provider" {
 }
 
 variable "region" {
-  description = "云服务区域，如 ap-beijing, us-east-1"
+  description = "AWS 区域，例如 us-east-1, ap-northeast-1 等"
   type        = string
-  default     = "ap-beijing"
+  default     = "us-east-1"
 }
 
-variable "TENCENT_SECRET_ID" {
-  description = "腾讯云 SecretId"
+variable "aws_access_key" {
+  description = "AWS 访问密钥 ID"
   type        = string
-  sensitive   = true
+  sensitive   = true  # 防止在输出中打印
 }
 
-variable "TENCENT_SECRET_KEY" {
-  description = "腾讯云 SecretKey"
+variable "aws_secret_key" {
+  description = "AWS 私密访问密钥"
   type        = string
-  sensitive   = true
-}
-
-variable "AWS_ASSUME_ROLE_ARN" {
-  description = "AWS Assume Role ARN（可选）"
-  type        = string
-  default     = ""
   sensitive   = true
 }
 
