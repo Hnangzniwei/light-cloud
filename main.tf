@@ -13,7 +13,7 @@ terraform {
     aws = {
       source  = "tencentcloudstack/tencentcloud"
   
-      version = "~> 5.0"  # 推荐使用最新稳定版
+      version = "~> 4.0"  # 推荐使用最新稳定版
     }
   }
 }
