@@ -21,12 +21,13 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-      - name: Terraform Init
-        run: terraform init
-        env:
-          TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TENCENT\_SECRET\_ID }}         TF\_VAR\_TENCENT\_SECRET\_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+    - name: Terraform Init
+      run: terraform init
+      env:
+        TF_VAR_TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+TF\_VAR\_TENCENT\_SECRET\_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
 
