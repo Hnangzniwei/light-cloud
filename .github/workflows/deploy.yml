@@ -28,11 +28,11 @@ jobs:
 
       # 5. 通过 SCP 将构建产物上传到服务器
       - name: Transfer files via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: <LaTex>${{ secrets.SSH\_HOST }}[ty-n]          username: $</LaTex>{{ secrets.SSH_USERNAME }}
-          key: <LaTex>${{ secrets.SSH\_PRIVATE\_KEY }}[ty-n]          source: "dist"[ty-n]          target: "/path/to/target"[ty-n][ty-n]      # 6. SSH 登录服务器并执行部署脚本[ty-n]      - name: Deploy via SSH[ty-n]        uses: appleboy/ssh-action@v0.1.7[ty-n]        with:[ty-n]          host: $</LaTex>{{ secrets.SSH_HOST }}
-          username: <LaTex>${{ secrets.SSH\_USERNAME }}[ty-n]          key: $</LaTex>{{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+  uses: appleboy/scp-action@v0.1.7
+  with:
+    host: ${{ secrets.SSH_HOST }}
+    username: ${{ secrets.SSH_USERNAME }}
+    key: ${{ secrets.SSH_PRIVATE_KEY }}
+
             cd /path/to/target
             # 这里可以添加重启服务等操作
