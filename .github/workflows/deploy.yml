@@ -8,28 +8,25 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # 1. 检出代码
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. 设置 Node.js 环境
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.11'
 
-      # 3. 安装依赖
       - name: Install dependencies
         run: npm install
 
-      # 4. 构建项目
       - name: Build project
         run: npm run build
 
-      # 5. 通过 SCP 将构建产物上传到服务器
       - name: Transfer files via SCP
-  uses: appleboy/scp-action@v0.1.7
-  with:
-    username: ${{ secrets.SSH\_USERNAME }}   ${{ secrets.SSH_PRIVATE_KEY }}
-    source: "dist/"
-    target: "/path/to/target"
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/"
+          target: "/path/to/target"
+
