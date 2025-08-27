@@ -30,6 +30,6 @@ jobs:
       - name: Transfer files via SCP
   uses: appleboy/scp-action@v0.1.7
   with:
-    username: <LaTex>${{ secrets.SSH\_USERNAME }}[ty-n]    key: $</LaTex>{{ secrets.SSH_PRIVATE_KEY }}
+    username: ${{ secrets.SSH\_USERNAME }}   ${{ secrets.SSH_PRIVATE_KEY }}
     source: "dist/"
     target: "/path/to/target"
