@@ -1,0 +1,42 @@
+name: Vue Deploy
+on:
+  push:
+    branches:
+      - main  # 当推送到 main 分支时触发部署
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 设置 Node.js 环境
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.11'
+
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: npm install
+
+      # 4. 构建项目
+      - name: Build project
+        run: npm run build
+
+      # 5. 通过 SCP 将构建产物上传到服务器
+      - name: Transfer files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: <LaTex>${{ secrets.SSH\_HOST }}[ty-n]          username: $</LaTex>{{ secrets.SSH_USERNAME }}
+          key: <LaTex>${{ secrets.SSH\_PRIVATE\_KEY }}[ty-n]          source: "dist"[ty-n]          target: $</LaTex>{{ secrets.DEPLOY_DIR }}
+
+      # 6. SSH 登录服务器并执行部署脚本
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: <LaTex>${{ secrets.SSH\_HOST }}[ty-n]          username: $</LaTex>{{ secrets.SSH_USERNAME }}
+          key: <LaTex>${{ secrets.SSH\_PRIVATE\_KEY }}[ty-n]          script: |[ty-n]            cd $</LaTex>{{ secrets.DEPLOY_DIR }}
+            # 这里可以添加重启服务等操作
