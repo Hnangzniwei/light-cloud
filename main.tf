@@ -10,10 +10,9 @@ locals {
 # 指定 Terraform 所需的 provider 和版本
 terraform {
   required_providers {
-    aws = {
+    tencentcloud = {
       source  = "tencentcloudstack/tencentcloud"
-  
-      version = "~> 4.0"  # 推荐使用最新稳定版
+      version = "1.82.18"   # 可选：锁定版本，不写则拉最新
     }
   }
 }
