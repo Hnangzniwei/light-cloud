@@ -34,5 +34,6 @@ jobs:
     username: ${{ secrets.SSH_USERNAME }}
     key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+
             cd /path/to/target
             # 这里可以添加重启服务等操作
