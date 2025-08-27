@@ -36,8 +36,7 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
-      run: |
-        terraform plan \
+     run: terraform -chdir=terraform-directory plan\
           -var="cloud_provider=${{ inputs.cloud_provider }}" \
           TF_VAR_TENCENT_SECRET_KEY=${{ secrets.TENCENT_SECRET_KEY }} \
           -auto-approve
