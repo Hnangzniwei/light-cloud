@@ -27,7 +27,9 @@ jobs:
         run: npm run build
 
       # 5. 通过 SCP 将构建产物上传到服务器
-      -  name: Transfer files via SCP[ty-n]  uses: appleboy/scp-action@v0.1.7[ty-n]  with:[ty-n]    host: $</LaTex>{{ secrets.SSH_HOST }}
+      - name: Transfer files via SCP
+  uses: appleboy/scp-action@v0.1.7
+  with:
     username: <LaTex>${{ secrets.SSH\_USERNAME }}[ty-n]    key: $</LaTex>{{ secrets.SSH_PRIVATE_KEY }}
-    source: "dist/"  # 确认源文件路径
-    target: "/path/to/target"  # 确认目标路径
+    source: "dist/"
+    target: "/path/to/target"
