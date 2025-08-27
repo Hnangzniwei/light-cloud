@@ -12,10 +12,10 @@ on:
         default: 'false'
         type: string
       cloud_provider:
-        description: 'Cloud provider (e.g., tencent)'
-        required: true
-        default: 'tencent'
-        type: string
+  description: 'Cloud provider (e.g., tencent)'
+  required: true
+  default: 'tencent'
+  type: string
 
 jobs:
   terraform:
@@ -28,6 +28,5 @@ jobs:
       - name: Terraform Init
         run: terraform init
         env:
-          TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]      - name: Terraform Validate[ty-n]        run: terraform validate[ty-n]      - name: Terraform Plan[ty-n]        run: terraform -chdir=terraform-directory plan\[ty-n]          -var="cloud\_provider=$</LaTex>{{ inputs.cloud_provider }}" \
-          TF_VAR_TENCENT_SECRET_KEY=<LaTex>${{ secrets.TENCENT\_SECRET\_KEY }} \[ty-n]          -auto-approve[ty-n]        env:[ty-n]          TF\_VAR\_TENCENT\_SECRET\_ID: $</LaTex>{{ secrets.TENCENT_SECRET_ID }}
+          TF_VAR_TENCENT_SECRET_ID: <LaTex>${{ secrets.TENCENT\_SECRET\_ID }}[ty-n]          TF\_VAR\_TENCENT\_SECRET\_KEY: $</LaTex>{{ secrets.TENCENT_SECRET_KEY }}
 
