@@ -17,26 +17,30 @@ terraform {
   }
 }
 
-# 配置 AWS Provider
-provider "tencentcloud"  {
-  region     = var.region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+provider "tencentcloud" {
+  secret_id  = var.tencent_secret_id
+  secret_key = var.tencent_secret_key
 }
 
-
-
-# 腾讯云 Lighthouse 实例（轻量应用服务器）
-resource "tencentcloud_lighthouse_instance" "lighthouse" {
-  count = local.is_tencent ? 1 : 0
-  availability_zone = lookup(var.tencent_zones, var.region, "${var.region}-1")
-  # 其他 Lighthouse 实例配置项...
+variable "tencent_secret_id" {
+  description = "The secret ID for Tencent Cloud"
 }
 
-# AWS 实例（示例，根据实际需求配置）
+variable "tencent_secret_key" {
+  description = "The secret key for Tencent Cloud"
+}
+
+variable "aws_ami" {
+  description = "The AMI ID for the AWS instance"
+  default     = "ami-xxxxxxxx"
+}
+
+variable "aws_instance_type" {
+  description = "The instance type for the AWS instance"
+  default     = "t2.micro"
+}
+
 resource "aws_instance" "example" {
-  count         = local.is_aws ? 1 : 0
   ami           = var.aws_ami
   instance_type = var.aws_instance_type
-  # 其他 AWS 实例配置项...
 }
