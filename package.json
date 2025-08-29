@@ -1,18 +1,30 @@
 {
   "name": "light-cloud",
   "version": "1.0.0",
-  "description": "A simple Node.js project",
+  "description": "A lightweight cloud service deployment project.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "git add . && git commit -m "deploy" && git push -u origin main",
+    "destroy": "git checkout -b destroy && git push -u origin destroy"
   },
-  "author": "Your Name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/你的用户名/light-cloud.git"
+  },
+  "keywords": [
+    "cloud",
+    "deployment",
+    "docker",
+    "github-actions"
+  ],
+  "author": "你的名字",
   "license": "MIT",
   "dependencies": {
-    // 这里添加你的项目依赖
+    "express": "^4.17.1",  // 示例依赖，根据实际需求添加
+    "dotenv": "^10.0.0"    // 示例依赖，用于管理环境变量
   },
   "devDependencies": {
-    // 这里添加你的开发依赖
+    "nodemon": "^2.0.7"  // 示例开发依赖，用于开发环境
   }
 }
