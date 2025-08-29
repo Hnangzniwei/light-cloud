@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "deploy": "git add . && git commit -m "deploy" && git push -u origin main",
+    "deploy": "git add . && git commit -m 'deploy' && git push -u origin main",
     "destroy": "git checkout -b destroy && git push -u origin destroy"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/你的用户名/light-cloud.git"
+    "url": "https://github.com/your-username/light-cloud.git"
   },
   "keywords": [
     "cloud",
@@ -18,13 +18,13 @@
     "docker",
     "github-actions"
   ],
-  "author": "你的名字",
+  "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",  // 示例依赖，根据实际需求添加
-    "dotenv": "^10.0.0"    // 示例依赖，用于管理环境变量
+    "express": "^4.17.1",
+    "dotenv": "^10.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"  // 示例开发依赖，用于开发环境
+    "nodemon": "^2.0.7"
   }
 }
