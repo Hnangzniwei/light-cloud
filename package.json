@@ -34,3 +34,6 @@
     "eslint-config-next": "14.0.0"
   }
 }
+export default function Home() {
+     return <div>Hello, Next.js!</div>;
+   }
