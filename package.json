@@ -1,30 +1,36 @@
 {
   "name": "light-cloud",
   "version": "1.0.0",
-  "description": "A lightweight cloud service deployment project.",
-  "main": "index.js",
+  "description": "A lightweight cloud service deployment project with React + Next.js.",
+  "private": true,
   "scripts": {
-    "start": "node index.js",
-    "deploy": "git add . && git commit -m 'deploy' && git push -u origin main",
-    "destroy": "git checkout -b destroy && git push -u origin destroy"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "git add . && git commit -m 'deploy' && git push origin main"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/your-username/light-cloud.git"
   },
   "keywords": [
+    "nextjs",
+    "react",
+    "ssr",
+    "static-site",
     "cloud",
-    "deployment",
-    "docker",
-    "github-actions"
+    "deployment"
   ],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
-    "dotenv": "^10.0.0"
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "eslint": "^8.48.0",
+    "eslint-config-next": "14.0.0"
   }
 }
